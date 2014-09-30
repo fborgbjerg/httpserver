@@ -24,27 +24,48 @@ namespace httpserver
         {
             TcpListener connectionSocket = new TcpListener(DefaultPort);
             connectionSocket.Start();
-            
+           
         
 
                 while (true)
                 {
-                    TcpClient client = connectionSocket.AcceptTcpClient();
-                    Stream ns = client.GetStream();
-                    StreamReader sr = new StreamReader(ns);
-                    StreamWriter sw = new StreamWriter(ns);
-                    sw.AutoFlush = true; // enable automatic flushing
+                    TcpClient client = null;
+                        
+                    try
+                    {
+                        client = connectionSocket.AcceptTcpClient();
+                        Stream ns = client.GetStream();
+                        StreamReader sr = new StreamReader(ns);
+                        StreamWriter sw = new StreamWriter(ns);
+                        sw.AutoFlush = true; // enable automatic flushing
 
-                    string message = sr.ReadLine();
-                    Console.WriteLine("Client: " + message);
-                    sw.Write("HTTP/1.0 200 OK \r\n");
-                    sw.Write("\r\n");
-                    sw.Write("Hello");
-                    client.Close();
-                    
+                        string message = sr.ReadLine();
+                        Console.WriteLine("Client: " + message);
+
+                        sw.Write("HTTP/1.0 200 OK \r\n");
+                        sw.Write("\r\n");
+                        //sw.Write("Hello");
+                        sw.Write(message);
+                    }
+                    catch (IOException ex)
+                    {
+
+                        Console.WriteLine(ex.Message);
+                    }
+
+                    finally
+                    {
+                        if (client != null)
+                        {
+                            client.Close();
+                        }
+                    }
+
+                     
 
                 }
-            
+
+                
         }
     }
 }
