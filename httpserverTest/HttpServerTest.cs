@@ -58,15 +58,13 @@ namespace httpserverTest
         /// <returns></returns>
         private static String GetFirstLine(String request)
         {
-            TcpClient client = new TcpClient("localhost", HttpServer.DefaultPort);
+            var client = new TcpClient("localhost", HttpServer.DefaultPort);
             NetworkStream networkStream = client.GetStream();
-
-            StreamWriter toServer = new StreamWriter(networkStream, Encoding.UTF8);
+            var toServer = new StreamWriter(networkStream, Encoding.UTF8);
             toServer.Write(request + CrLf);
             toServer.Write(CrLf);
             toServer.Flush();
-
-            StreamReader fromServer = new StreamReader(networkStream);
+            var fromServer = new StreamReader(networkStream);
             String firstline = fromServer.ReadLine();
             toServer.Close();
             fromServer.Close();

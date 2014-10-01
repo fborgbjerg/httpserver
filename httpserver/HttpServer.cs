@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace httpserver
@@ -11,16 +8,18 @@ namespace httpserver
     public class HttpServer
     {
         public static readonly int DefaultPort = 8888;
-        private static readonly string RootCatalog = "c:/temp";
+        private const string RootCatalog = "c:/temp";
         public int Port { get; set; }
 
         public HttpServer(int port)
         {
             Port = port;
         }
+
+
         public void Run()
         {
-            TcpListener connectionSocket = new TcpListener(DefaultPort);
+            var connectionSocket = new TcpListener(DefaultPort);
             connectionSocket.Start();
             while (true)
             {
@@ -28,10 +27,11 @@ namespace httpserver
                 try
                 {
                     client = connectionSocket.AcceptTcpClient();
+                    Task.Run(() => GetStaticValue(client));
+                   
                     Stream ns = client.GetStream();
-                    StreamReader sr = new StreamReader(ns);
-                    StreamWriter sw = new StreamWriter(ns);
-                    sw.AutoFlush = true; // enable automatic flushing
+                    var sr = new StreamReader(ns);
+                    var sw = new StreamWriter(ns) {AutoFlush = true};
 
                     string message = sr.ReadLine();
                     Console.WriteLine("Client: " + message);
@@ -94,6 +94,29 @@ namespace httpserver
             catch (FileNotFoundException)
             {
                 sw.Write("HTTP/1.0 404 Not Found\r\n");
+            }
+        }
+        private void GetStaticValue(TcpClient connectionSocket)
+        {
+            try
+            {
+                Console.WriteLine("Server activated");
+                var ns = connectionSocket.GetStream();
+                var sr = new StreamReader(ns);
+                var sw = new StreamWriter(ns);
+                sw.Write("HTTP/1.0 200 OK\r\n");
+                sw.Write("\r\n Hello World!");
+                sw.Flush();
+
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                connectionSocket.Close();
             }
         }
     }
