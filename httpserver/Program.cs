@@ -9,16 +9,20 @@ namespace httpserver
 {
     class Program
     {
+        public static readonly int DefaultPort = 8888;
+
         static void Main(string[] args)
         {
+
+            Console.WriteLine("Hello http server");
            
-            HttpServer server = new HttpServer(8888);
+            HttpServer server = new HttpServer(DefaultPort);
             server.Run();
 
 
             
             
-            Console.WriteLine("Hello http server");
+            
         }
     }
 }
