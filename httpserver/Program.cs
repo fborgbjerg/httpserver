@@ -12,11 +12,10 @@ namespace httpserver
         static void Main(string[] args)
         {
 
-            Console.WriteLine("Hello http server");
+            //Console.WriteLine("Hello http server");
            
             var server = new HttpServer(DefaultPort);
             server.Run();
-            Console.ReadLine();
         }
     }
 }

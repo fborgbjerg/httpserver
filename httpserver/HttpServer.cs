@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -14,6 +15,9 @@ namespace httpserver
         private string _response = ""; //Empty response string, is build upon in Run()
         private static readonly string RootCatalog = "C:/temp";
         public int Port { get; set; }
+        public const string Logsource = "httpserver";
+        public const string SLog = "Application";
+        
 
         public HttpServer(int port)
         {
@@ -28,10 +32,13 @@ namespace httpserver
                 try
                 {
                     TcpListener connectionSocket = new TcpListener(DefaultPort);
+                    Console.WriteLine("Server started");
                     connectionSocket.Start();
+                    EventLog.WriteEntry(Logsource, "establish connection to the client through the default port");
                     while (true)
                     {
                         client = connectionSocket.AcceptTcpClient();
+                        EventLog.WriteEntry(Logsource, "accept connection with client" + client);
                         Task.Run(()=>GetValue(client));
                         //GetValue(client);
                     }
@@ -46,7 +53,9 @@ namespace httpserver
                     if (client != null)
                     {
                         client.Close();
+                        EventLog.WriteEntry(Logsource, "Connection closed");
                     }
+                   
                 }
             }
         }
@@ -55,7 +64,7 @@ namespace httpserver
         {
             try
             {
-                Console.WriteLine("Server activated");
+                EventLog.WriteEntry(Logsource,"Server activated");
                 Stream ns = client.GetStream();
 
                 StreamReader sr = new StreamReader(ns);
@@ -63,7 +72,8 @@ namespace httpserver
                 sw.AutoFlush = true; // enable automatic flushing
 
                 string message = sr.ReadLine();
-                Console.WriteLine("Client: " + message);
+                EventLog.WriteEntry(Logsource, "get request from the client" + message);
+                //Console.WriteLine("Client: " + message);
 
                 if (message != null)
                 {
@@ -117,6 +127,7 @@ namespace httpserver
             finally
             {
                 client.Close();
+                EventLog.WriteEntry(Logsource, "Close connection");
             }
         }
     }
