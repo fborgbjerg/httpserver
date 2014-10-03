@@ -15,7 +15,7 @@ namespace httpserver
             //Console.WriteLine("Hello http server");
            
             var server = new HttpServer(DefaultPort);
-            server.Run();
+            server.RunServer();
         }
     }
 }

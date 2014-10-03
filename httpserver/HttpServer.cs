@@ -17,15 +17,15 @@ namespace httpserver
         public int Port { get; set; }
         public const string Logsource = "httpserver";
         public const string SLog = "Application";
-        
+
 
         public HttpServer(int port)
         {
             Port = port;
         }
-        public void Run()
+        public void RunServer()
         {
-            
+
             while (true)
             {
                 TcpClient client = null;
@@ -39,10 +39,10 @@ namespace httpserver
                     {
                         client = connectionSocket.AcceptTcpClient();
                         EventLog.WriteEntry(Logsource, "accept connection with client" + client);
-                        Task.Run(()=>GetValue(client));
+                        Task.Run(() => RunClient(client));
                         //GetValue(client);
                     }
-                    
+
                 }
                 catch (IOException ex)
                 {
@@ -55,16 +55,16 @@ namespace httpserver
                         client.Close();
                         EventLog.WriteEntry(Logsource, "Connection closed");
                     }
-                   
+
                 }
             }
         }
 
-        private void GetValue(TcpClient client)
+        private void RunClient(TcpClient client)
         {
             try
             {
-                EventLog.WriteEntry(Logsource,"Server activated");
+                EventLog.WriteEntry(Logsource, "Server activated");
                 Stream ns = client.GetStream();
 
                 StreamReader sr = new StreamReader(ns);
@@ -73,7 +73,7 @@ namespace httpserver
 
                 string message = sr.ReadLine();
                 EventLog.WriteEntry(Logsource, "get request from the client" + message);
-                //Console.WriteLine("Client: " + message);
+                Console.WriteLine("Client: " + message);
 
                 if (message != null)
                 {
@@ -98,8 +98,15 @@ namespace httpserver
                                     {
                                         sw.Write("HTTP/1.0 200 OK\r\n");
                                         _response += reader.ReadToEnd();
+                                        double n = GetContentLenght(tokens[1]);
+                                        sw.Write("Content-Type: " + ContentType.GetContentType(tokens[1]) + "\r\n");
+                                        Console.WriteLine("Content-Type: " + ContentType.GetContentType(tokens[1]));
+                                        sw.Write("Content-Lenght: " + n + "\r\n");
+                                        Console.WriteLine("Content-Lenght: " + n);
+                                        sw.Write("Date: " + DateTime.Now.Date.ToUniversalTime().ToString("r") + "\r\n");
+                                        Console.WriteLine("Date: " + DateTime.Now.Date.ToUniversalTime().ToString("r"));
                                         Console.WriteLine(_response);
-                                        sw.Write("\r\n"+_response);
+                                        sw.Write("\r\n" + _response);
                                         sw.Flush();
                                     }
                                 }
@@ -130,5 +137,12 @@ namespace httpserver
                 EventLog.WriteEntry(Logsource, "Close connection");
             }
         }
+        private double GetContentLenght(string filename)
+        {
+            var f = new FileInfo(RootCatalog + filename);
+            long s1 = f.Length;
+            return s1;
+        }
     }
 }
+
