@@ -21,8 +21,7 @@ namespace httpserverTest
             line = GetFirstLine("GET /fileDoesNotExist.txt HTTP/1.0");
             Assert.AreEqual("HTTP/1.0 404 Not Found", line);
         }
-
-
+        
         [TestMethod]
         public void TestGetIllegalRequest()
         {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.Remoting.Channels;
+using System.Threading.Tasks;
 
 
 namespace httpserver
@@ -14,6 +16,7 @@ namespace httpserver
            
             var server = new HttpServer(DefaultPort);
             server.Run();
+            Console.ReadLine();
         }
     }
 }
